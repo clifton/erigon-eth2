@@ -4,7 +4,20 @@ x-erigon-service: &default-erigon-service
   image: thorax/erigon:v2022.08.02
   user: 0:0
   volumes:
-    - ./.data/:/data/
+    - .data:/data
+    - .jwtsecret:/jwtsecret
+  restart: unless-stopped
+  mem_swappiness: 0
+
+x-lighthouse-service: &default-lighthouse-service
+  image: sigp/lighthouse:latest-modern
+  user: 0:0
+  volumes:
+    - .lighthouse:/root/.lighthouse
+    - ./validator_keys:/root/validator_keys
+    - .jwtsecret:/jwtsecret
+  environment:
+    - FEE_RECIPIENT="${FEE_RECIPIENT}"
   restart: unless-stopped
   mem_swappiness: 0
 
@@ -21,6 +34,9 @@ services:
       --datadir=/data --port=30304
       --metrics --metrics.addr=0.0.0.0 --metrics.port=6060
       --private.api.addr=0.0.0.0:9090
+      --authrpc.jwtsecret=/jwtsecret/jwt.hex
+      --authrpc.vhosts=*
+      --authrpc.addr=0.0.0.0
 
   rpcdaemon:
     <<: *default-erigon-service
@@ -37,8 +53,21 @@ services:
       --http.addr=0.0.0.0 --http.vhosts=* --http.corsdomain=*
       --http.api=eth,erigon,web3,net,debug,trace,txpool --ws
 
+  beacon:
+    <<: *default-lighthouse-service
+    depends_on:
+      - erigon
+    command: >-
+      lighthouse --network mainnet beacon
+        --staking --validator-monitor-auto
+        --http --http-address 0.0.0.0 --http-port 5052
+        --metrics --metrics-address 0.0.0.0 --metrics-port 5053
+        --suggested-fee-recipient $FEE_RECIPIENT
+        --execution-endpoint http://erigon:8551
+        --execution-jwt /jwtsecret/jwt.hex
+
   prometheus:
-    image: prom/prometheus:v2.30.2
+    image: prom/prometheus
     command: --log.level=warn --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles
     ports:
       - "9090:9090"
@@ -48,7 +77,7 @@ services:
     restart: always
 
   grafana:
-    image: grafana/grafana:8.2.2
+    image: grafana/grafana
     ports:
       - "3030:3000"
     volumes:
