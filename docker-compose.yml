@@ -35,7 +35,7 @@ services:
       --metrics --metrics.addr=0.0.0.0 --metrics.port=6060
       --private.api.addr=0.0.0.0:9090
       --authrpc.jwtsecret=/jwtsecret/jwt.hex
-      --authrpc.vhosts=*
+      --authrpc.vhosts="*"
       --authrpc.addr=0.0.0.0
 
   rpcdaemon:
@@ -50,17 +50,21 @@ services:
       --datadir=/data
       --private.api.addr=erigon:9090
       --txpool.api.addr=erigon:9090
-      --http.addr=0.0.0.0 --http.vhosts=* --http.corsdomain=*
+      --http.addr=0.0.0.0 --http.vhosts="*" --http.corsdomain="*"
       --http.api=eth,erigon,web3,net,debug,trace,txpool --ws
 
   beacon:
     <<: *default-lighthouse-service
     depends_on:
       - erigon
+    ports:
+      - "9009:9009/tcp"
+      - "9009:9009/udp"
     command: >-
       lighthouse --network mainnet beacon
+        --port 9009
         --staking --validator-monitor-auto
-        --http --http-address 0.0.0.0 --http-port 5052
+        --http --http-address 0.0.0.0 --http-port 5052 --http-allow-origin "*"
         --metrics --metrics-address 0.0.0.0 --metrics-port 5053
         --suggested-fee-recipient $FEE_RECIPIENT
         --execution-endpoint http://erigon:8551
