@@ -21,6 +21,7 @@ x-lighthouse-service: &default-lighthouse-service
   restart: unless-stopped
   mem_swappiness: 0
 
+
 services:
 
   erigon:
@@ -69,6 +70,22 @@ services:
         --suggested-fee-recipient $FEE_RECIPIENT
         --execution-endpoint http://erigon:8551
         --execution-jwt /jwtsecret/jwt.hex
+
+  # https://developer.offchainlabs.com/node-running/running-a-node
+  arbitrum:
+    image: offchainlabs/nitro-node:v2.0.1-c48b8be
+    volumes:
+      - .arbitrum:/home/user/.arbitrum
+    depends_on:
+      - erigon
+    ports:
+      - "8547:8547"
+      - "8548:8548"
+    command: >-
+      --l1.url=http://rpcdaemon:8545 --l2.chain-id=42161
+      --http.api=net,web3,eth,debug --http.corsdomain=*
+      --http.addr=0.0.0.0 --http.vhosts=*
+      --init.url="https://snapshot.arbitrum.io/mainnet/nitro.tar"
 
   prometheus:
     image: prom/prometheus
