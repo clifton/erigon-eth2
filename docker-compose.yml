@@ -53,8 +53,10 @@ services:
       --http.addr=0.0.0.0 --http.vhosts="*" --http.corsdomain="*"
       --http.api=eth,erigon,web3,net,debug,trace,txpool --ws
 
+  # https://lighthouse-book.sigmaprime.io/builders.html
   beacon:
     <<: *default-lighthouse-service
+    restart: unless-stopped
     depends_on:
       - erigon
       - mev-boost
@@ -73,8 +75,22 @@ services:
         --checkpoint-sync-url $BEACON_CHECKPOINT_URL
         --builder http://mev-boost:18550
 
+  # https://lighthouse-book.sigmaprime.io/builders.html
+  # add: --strict-fee-recipient --builder-proposals --suggested-fee-recipient
+  validator:
+    <<: *default-lighthouse-service
+    restart: unless-stopped
+    depends_on:
+      - mev-boost
+      - beacon
+      - erigon
+    command:
+      echo true
+
+  # https://github.com/flashbots/mev-boost#usage
   mev-boost:
     image: flashbots/mev-boost:latest
+    restart: unless-stopped
     ports:
       - "18550:18550"
     environment:
