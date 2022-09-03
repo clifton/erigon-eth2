@@ -71,6 +71,16 @@ services:
         --execution-jwt /jwtsecret/jwt.hex
         --checkpoint-sync-url $BEACON_CHECKPOINT_URL
 
+  mev-boost:
+    image: flashbots/mev-boost:latest
+    ports:
+      - "18550:18550"
+    environment:
+      - MEV_BOOST_RELAYS="${MEV_BOOST_RELAYS}"
+    command: >-
+      -addr 0.0.0.0:18550 -mainnet -relay-check -relays $MEV_BOOST_RELAYS
+
+
   # https://developer.offchainlabs.com/node-running/running-a-node
   arbitrum:
     image: offchainlabs/nitro-node:v2.0.1-c48b8be
