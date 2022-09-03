@@ -57,6 +57,7 @@ services:
     <<: *default-lighthouse-service
     depends_on:
       - erigon
+      - mev-boost
     ports:
       - "9009:9009/tcp"
       - "9009:9009/udp"
@@ -70,6 +71,7 @@ services:
         --execution-endpoint http://erigon:8551
         --execution-jwt /jwtsecret/jwt.hex
         --checkpoint-sync-url $BEACON_CHECKPOINT_URL
+        --builder http://mev-boost:18550
 
   mev-boost:
     image: flashbots/mev-boost:latest
@@ -86,6 +88,8 @@ services:
     image: offchainlabs/nitro-node:v2.0.1-c48b8be
     restart: unless-stopped
     mem_swappiness: 0
+    # state held in memory, needs time to save to disk
+    stop_grace_period: 5m
     volumes:
       - .arbitrum:/home/user/.arbitrum
     depends_on:
