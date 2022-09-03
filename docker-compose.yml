@@ -1,8 +1,8 @@
 version: '2.2'
 
 x-erigon-service: &default-erigon-service
-  image: thorax/erigon:v2022.08.02
-  user: 0:0
+  image: thorax/erigon:v2022.08.03
+  user: 1000:1000
   volumes:
     - .data:/data
     - .jwtsecret:/jwtsecret
@@ -11,16 +11,15 @@ x-erigon-service: &default-erigon-service
 
 x-lighthouse-service: &default-lighthouse-service
   image: sigp/lighthouse:latest-modern
-  user: 0:0
   volumes:
     - .lighthouse:/root/.lighthouse
     - ./validator_keys:/root/validator_keys
     - .jwtsecret:/jwtsecret
   environment:
     - FEE_RECIPIENT="${FEE_RECIPIENT}"
+    - BEACON_CHECKPOINT_URL="${BEACON_CHECKPOINT_URL}"
   restart: unless-stopped
   mem_swappiness: 0
-
 
 services:
 
@@ -70,10 +69,13 @@ services:
         --suggested-fee-recipient $FEE_RECIPIENT
         --execution-endpoint http://erigon:8551
         --execution-jwt /jwtsecret/jwt.hex
+        --checkpoint-sync-url $BEACON_CHECKPOINT_URL
 
   # https://developer.offchainlabs.com/node-running/running-a-node
   arbitrum:
     image: offchainlabs/nitro-node:v2.0.1-c48b8be
+    restart: unless-stopped
+    mem_swappiness: 0
     volumes:
       - .arbitrum:/home/user/.arbitrum
     depends_on:
@@ -85,6 +87,7 @@ services:
       --l1.url=http://rpcdaemon:8545 --l2.chain-id=42161
       --http.api=net,web3,eth,debug --http.corsdomain=*
       --http.addr=0.0.0.0 --http.vhosts=*
+      --node.archive
       --init.url="https://snapshot.arbitrum.io/mainnet/nitro.tar"
 
   prometheus:
