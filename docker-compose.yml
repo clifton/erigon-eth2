@@ -63,6 +63,8 @@ services:
     ports:
       - "9009:9009/tcp"
       - "9009:9009/udp"
+      - "5052:5052"
+      - "5053:5053"
     command: >-
       lighthouse --network mainnet beacon
         --port 9009
@@ -77,15 +79,15 @@ services:
 
   # https://lighthouse-book.sigmaprime.io/builders.html
   # add: --strict-fee-recipient --builder-proposals --suggested-fee-recipient
-  validator:
-    <<: *default-lighthouse-service
-    restart: unless-stopped
-    depends_on:
-      - mev-boost
-      - beacon
-      - erigon
-    command:
-      echo true
+  # validator:
+  #   <<: *default-lighthouse-service
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - mev-boost
+  #     - beacon
+  #     - erigon
+  #   command:
+  #     echo true
 
   # https://github.com/flashbots/mev-boost#usage
   mev-boost:
