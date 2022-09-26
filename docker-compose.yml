@@ -76,6 +76,7 @@ services:
         --execution-jwt /jwtsecret/jwt.hex
         --checkpoint-sync-url $BEACON_CHECKPOINT_URL
         --builder http://mev-boost:18550
+        --prune-payloads false
 
   # https://lighthouse-book.sigmaprime.io/builders.html
   # add: --strict-fee-recipient --builder-proposals --suggested-fee-recipient
@@ -103,7 +104,7 @@ services:
 
   # https://developer.offchainlabs.com/node-running/running-a-node
   arbitrum:
-    image: offchainlabs/nitro-node:v2.0.1-c48b8be
+    image: offchainlabs/nitro-node:v2.0.6-92bc70d
     restart: unless-stopped
     mem_swappiness: 0
     # state held in memory, needs time to save to disk
