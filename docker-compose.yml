@@ -1,7 +1,7 @@
 version: '2.2'
 
 x-erigon-service: &default-erigon-service
-  image: thorax/erigon:v2022.09.03
+  image: thorax/erigon:v2.28.1
   user: 1000:1000
   volumes:
     - .data:/data
@@ -104,7 +104,7 @@ services:
 
   # https://developer.offchainlabs.com/node-running/running-a-node
   arbitrum:
-    image: offchainlabs/nitro-node:v2.0.6-92bc70d
+    image: offchainlabs/nitro-node:v2.0.7-10b845c
     restart: unless-stopped
     mem_swappiness: 0
     # state held in memory, needs time to save to disk
