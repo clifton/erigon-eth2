@@ -1,7 +1,7 @@
 version: '2.2'
 
 x-erigon-service: &default-erigon-service
-  image: thorax/erigon:v2.29.0
+  image: thorax/erigon:v2.30.0
   user: 1000:1000
   volumes:
     - .data:/data
@@ -37,6 +37,7 @@ services:
       --authrpc.jwtsecret=/jwtsecret/jwt.hex
       --authrpc.vhosts="*"
       --authrpc.addr=0.0.0.0
+      --externalcl
 
   rpcdaemon:
     <<: *default-erigon-service
