@@ -1,8 +1,8 @@
 version: '2.2'
 
 x-erigon-service: &default-erigon-service
-  image: thorax/erigon:v2.30.0
-  user: 1000:1000
+  image: thorax/erigon:v2.35.2
+  user: 0:0
   volumes:
     - .data:/data
     - .jwtsecret:/jwtsecret
@@ -38,6 +38,7 @@ services:
       --authrpc.vhosts="*"
       --authrpc.addr=0.0.0.0
       --externalcl
+      --torrent.download.rate=300mb
 
   rpcdaemon:
     <<: *default-erigon-service
