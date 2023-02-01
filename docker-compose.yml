@@ -1,7 +1,7 @@
 version: '2.2'
 
 x-erigon-service: &default-erigon-service
-  image: thorax/erigon:v2.35.2
+  image: thorax/erigon:v2.37.0
   user: 0:0
   volumes:
     - .data:/data
