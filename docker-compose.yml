@@ -1,7 +1,7 @@
 version: '2.2'
 
 x-erigon-service: &default-erigon-service
-  image: thorax/erigon:v2.38.1
+  image: thorax/erigon:v2.40.1
   user: 0:0
   volumes:
     - .data:/data
@@ -28,9 +28,10 @@ services:
     ports:
       - "30304:30304/tcp"
       - "30304:30304/udp"
+      - "6060:6060"
+      - "8545:8545"
     # for merge add --authrpc.addr=0.0.0.0 --authrpc.vhosts=*
     command: >-
-      erigon
       --datadir=/data --port=30304
       --metrics --metrics.addr=0.0.0.0 --metrics.port=6060
       --private.api.addr=0.0.0.0:9090
@@ -39,17 +40,6 @@ services:
       --authrpc.addr=0.0.0.0
       --externalcl
       --torrent.download.rate=300mb
-
-  rpcdaemon:
-    <<: *default-erigon-service
-    # Use erigon's PID namespace. It's required to open Erigon's DB from
-    # another process (RPCDaemon local-mode)
-    pid: service:erigon
-    ports:
-      - "8545:8545"
-    command: >-
-      rpcdaemon
-      --datadir=/data
       --private.api.addr=erigon:9090
       --txpool.api.addr=erigon:9090
       --http.addr=0.0.0.0 --http.vhosts="*" --http.corsdomain="*"
@@ -119,7 +109,7 @@ services:
       - "8547:8547"
       - "8548:8548"
     command: >-
-      --l1.url=http://rpcdaemon:8545 --l2.chain-id=42161
+      --l1.url=http://erigon:8545 --l2.chain-id=42161
       --http.api=net,web3,eth,debug --http.corsdomain=*
       --http.addr=0.0.0.0 --http.vhosts=*
       --node.archive
