@@ -1,7 +1,7 @@
 version: '2.2'
 
 x-erigon-service: &default-erigon-service
-  image: thorax/erigon:v2.40.1
+  image: thorax/erigon:v2.44.0
   user: 0:0
   volumes:
     - .data:/data
@@ -38,7 +38,6 @@ services:
       --authrpc.jwtsecret=/jwtsecret/jwt.hex
       --authrpc.vhosts="*"
       --authrpc.addr=0.0.0.0
-      --externalcl
       --torrent.download.rate=300mb
       --private.api.addr=erigon:9090
       --txpool.api.addr=erigon:9090
